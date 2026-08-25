@@ -15,9 +15,9 @@ from googleapiclient.discovery import build
 SOCIAVAULT_API_KEY = os.environ.get("SOCIAVAULT_API_KEY", "")
 GEMINI_API_KEY     = os.environ.get("GEMINI_API_KEY_KC", "")
 GDRIVE_CREDENTIALS = os.environ.get("GDRIVE_CREDENTIALS_KC", "")
-SHEET_INPUT_ID            = "1947Wx86ZtNWQSaqcYVSXv_3WLvIA0p6u_Ol1DZ8GmX8"
-SHEET_TT_DATA_COMMENTS_ID = "1BD4OoVfXZHI6p5kJ6KmLAMsPfpQ86MjdNdVoPPWhgkg"
-SHEET_TT_DATA_POST_ID     = "1CtvNfYM5Jp_kuriycsYMAMzCQYW0pFxqvGmOD0O4n80"
+SHEET_INPUT_ID            = "1xmm88zF84MEk-7ZwARh6ZCFcaI2SmW8c7Dnlwe4zGr4"
+SHEET_TT_DATA_COMMENTS_ID = "1nHmuARdf6vLGGZw2ykXlL5zJ_KOa15-7BARxGHaGP2U"
+SHEET_TT_DATA_POST_ID     = "1GWe4XOZatmvNknH6GmvrEKnDjNSTUK4OOQoqV4So0zQ"
 TAB_INPUT            = "tiktok_profile"
 TAB_TT_DATA_COMMENTS = "tt_data_comments_post"
 TAB_TT_DATA_POST     = "tt_data_post_post"
