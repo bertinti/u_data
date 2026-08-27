@@ -31,6 +31,5 @@ jobs:
           GDRIVE_CREDENTIALS_KC: ${{ secrets.GDRIVE_CREDENTIALS_KC }}
         run: |
            papermill instagram_influencers_consolidate.ipynb /dev/null
-#          papermill tiktok_influencers_consolidate.ipynb /dev/null
-
-#          papermill influencers_final_consolidate.ipynb /dev/null
+           papermill tiktok_influencers_consolidate.ipynb /dev/null
+           papermill influencers_final_consolidate.ipynb /dev/null
