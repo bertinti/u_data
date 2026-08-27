@@ -30,6 +30,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GDRIVE_CREDENTIALS_KC: ${{ secrets.GDRIVE_CREDENTIALS_KC }}
         run: |
-          papermill tiktok_influencers_consolidate.ipynb /dev/null
-#          papermill instagram_influencers_consolidate.ipynb /dev/null
+           papermill instagram_influencers_consolidate.ipynb /dev/null
+#          papermill tiktok_influencers_consolidate.ipynb /dev/null
+
 #          papermill influencers_final_consolidate.ipynb /dev/null
