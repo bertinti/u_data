@@ -32,7 +32,7 @@ GEMINI_API_KEY_KC = os.environ.get("GEMINI_API_KEY_KC")
  
 COMMENTS_LIMIT = 300
 BATCH_SIZE = 20
-POST_EXPIRY_DAYS = 14
+POST_EXPIRY_DAYS = 30
  
 # Endpoints SociaVault
 POST_INFO_ENDPOINT = "https://api.sociavault.com/v1/scrape/instagram/post-info"
