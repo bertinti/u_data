@@ -28,7 +28,7 @@ TAB_TT_DATA_COMMENTS = "tt_data_comments"
 
 API_BASE         = "https://api.sociavault.com/v1/scrape/tiktok"
 MAX_POSTS        = 1
-POST_MAX_DAYS    = 14
+POST_MAX_DAYS    = 30
 GEMINI_BATCH     = 1
 GEMINI_MAX_RETRY = 2
 COMMENTS_LIMIT   = 1
