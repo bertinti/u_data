@@ -73,6 +73,24 @@ def ensure_header(service, spreadsheet_id, tab, columns):
             valueInputOption="RAW",
             body={"values": [columns]}
         ).execute()
+def ensure_column_at_end(service, spreadsheet_id, tab, col_name):
+    """Garante que `col_name` exista no cabeçalho da aba. Se não existir,
+    adiciona como ÚLTIMA coluna (sem mover as demais). Retorna o cabeçalho."""
+    result = service.spreadsheets().values().get(
+        spreadsheetId=spreadsheet_id,
+        range=f"{tab}!A1:1"
+    ).execute()
+    header = (result.get("values") or [[]])[0]
+    if col_name not in header:
+        service.spreadsheets().values().update(
+            spreadsheetId=spreadsheet_id,
+            range=f"{tab}!{_col_letter(len(header))}1",
+            valueInputOption="RAW",
+            body={"values": [[col_name]]}
+        ).execute()
+        header = header + [col_name]
+        print(f"  Coluna '{col_name}' adicionada ao final de {tab}.", flush=True)
+    return header
 def ts_to_datetime(value):
     """Converte um unix timestamp (segundos) em string datetime UTC.
     Retorna '' se o valor não for um número válido (ex.: vazio, '#VALUE!')."""
@@ -151,6 +169,11 @@ def atualizar_post_max(service):
     print(f"  {len(df_src)} aweme_id(s) únicos após deduplicação.", flush=True)
  
     # --- 4. Ler destino (máximos) e garantir cabeçalho -----------------------
+    # Garante a coluna de seguidores como última coluna da aba de máximos
+    # (só se a aba já tiver cabeçalho; se estiver vazia, herda da origem).
+    if read_sheet(service, SHEET_TT_DATA_POST_ID, TAB_TT_DATA_POST_MAX).columns.size:
+        ensure_column_at_end(service, SHEET_TT_DATA_POST_ID,
+                             TAB_TT_DATA_POST_MAX, FOLLOWER_COL)
     df_max = read_sheet(service, SHEET_TT_DATA_POST_ID, TAB_TT_DATA_POST_MAX)
     if df_max.empty or not list(df_max.columns):
         # aba vazia: usa como cabeçalho as colunas da origem (menos o helper)
@@ -212,7 +235,7 @@ NUM_COLS_MAX = {
     "likes", "digg_count", "comment_count", "share_count",
     "views", "play_count", "saves", "collect_count",
     "download_count", "whatsapp_share_count", "forward_count",
-    "repost_count", "create_time",
+    "repost_count", "create_time", "follower_count",
 }
 DT_COLS_MAX = {"run_datetime", "Published date"}
 
@@ -488,6 +511,10 @@ POST_COLS = [
     "play_count", "collect_count", "download_count", "whatsapp_share_count",
     "forward_count", "repost_count", "desc", "create_time"
 ]
+# Nova coluna: seguidores do autor, vinda do próprio video-info.
+# Fica SEMPRE como última coluna da aba (depois de "Published date"),
+# para não deslocar nenhuma coluna existente.
+FOLLOWER_COL = "follower_count"
 def processar_video_info(service, post):
     video_url = post["video_url"]
     video_id  = post["video_id"]
@@ -499,8 +526,15 @@ def processar_video_info(service, post):
         print(f"    Erro ao buscar video-info de {video_id}: {e}", flush=True)
         return
     ensure_header(service, SHEET_TT_DATA_POST_ID, TAB_TT_DATA_POST, POST_COLS)
+    header = ensure_column_at_end(service, SHEET_TT_DATA_POST_ID,
+                                  TAB_TT_DATA_POST, FOLLOWER_COL)
     aweme = data.get("data", {}).get("aweme_detail", {})
     stats = aweme.get("statistics", {})
+    author = aweme.get("author", {}) or {}
+    followers = author.get("follower_count", "")
+    if followers in ("", None):
+        print(f"    Aviso: follower_count não veio no video-info de {video_id}.", flush=True)
+        followers = ""
     row = {
         "video_url":            video_url,
         "username":             username,                              # FIX: campo adicionado ao POST_COLS
@@ -518,7 +552,13 @@ def processar_video_info(service, post):
         "desc":                 aweme.get("desc", ""),                # FIX: buscado em aweme, não em stats
         "create_time":          aweme.get("create_time", "")         # FIX: era v.get() — variável inexistente
     }
-    df_row = pd.DataFrame([row])[POST_COLS]
+    # Mantém a escrita posicional das 15 colunas originais (A..O) e coloca
+    # follower_count na posição real dele no cabeçalho (ex.: coluna Q),
+    # deixando em branco o que estiver no meio (ex.: "Published date").
+    values = [row[c] for c in POST_COLS]
+    values += [""] * (len(header) - len(values))
+    values[header.index(FOLLOWER_COL)] = followers
+    df_row = pd.DataFrame([values])
     append_to_sheet(service, SHEET_TT_DATA_POST_ID, TAB_TT_DATA_POST, df_row)
     print(f"    video-info salvo para {video_id}.", flush=True)
 # ==============================
