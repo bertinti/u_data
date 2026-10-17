@@ -26,7 +26,7 @@ API_BASE         = "https://api.sociavault.com/v1/scrape/tiktok"
 POST_MAX_DAYS    = 365
 GEMINI_BATCH     = 20
 GEMINI_MAX_RETRY = 3
-COMMENTS_LIMIT   = 0
+COMMENTS_LIMIT   = 100
 # ==============================
 # GOOGLE SHEETS HELPERS
 # ==============================
